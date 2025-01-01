@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/clubs")
@@ -31,11 +32,32 @@ public class ClubController {
         return "clubs-list";
     }
 
+    @GetMapping("search")
+    public String clubsSearch(@RequestParam("q") String query, Model model) {
+        Optional<List<ClubDto>> optionalClubList = clubService.getClubsByTitle(query);
+        model.addAttribute("clubs", optionalClubList.get());
+        model.addAttribute("query", query);
+        return "clubs-list";
+    }
+
+    @GetMapping("/{clubId}")
+    public String club(@PathVariable int clubId, Model model) {
+        ClubDto clubDto = clubService.findClubById(clubId);
+        model.addAttribute("club", clubDto);
+        return "club-detail";
+    }
+
     @GetMapping("/new")
     public String createClubForm(Model model) {
         Club club = new Club();
         model.addAttribute("club", club);
         return "clubs-create";
+    }
+
+    @GetMapping("/{clubId}/delete")
+    public String deleteClub(@PathVariable("clubId") int clubId) {
+        clubService.deleteClubById(clubId);
+        return "redirect:/clubs";
     }
 
     @PostMapping("/new")

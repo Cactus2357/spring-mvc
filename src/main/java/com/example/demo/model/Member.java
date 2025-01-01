@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Member {
-    int memberId;
+    Integer memberId;
     String name;
     String email;
     LocalDateTime joinDate;

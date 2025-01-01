@@ -19,16 +19,20 @@
             </nav>
         </div>
         <div class="container px-5">
-            <div class="container">
-                <a th:href="@{/clubs/new}" class="btn btn-primary">Add club</a>
+            <div class="container d-flex">
+                <form th:action="@{/clubs/search}" method="get">
+                    <input class="form-control" type="search" name="q" id="query" th:value="${query}" placeholder="Search...">
+                </form>
+                <a th:href="@{/clubs/new}" class="btn btn-primary ms-3">Add club</a>
             </div>
             <hr>
             <div class="container">
                 <div class="row g-3">
                     <div th:each="club:${clubs}" class="col-lg-6">
                         <img th:src="${club.photoUrl}" alt="" class="img-fluid rounded-3 mb-3">
-                        <a th:text="${club.title}" th:href="${club.photoUrl}" class="btn btn-dark">Project name</a>
+                        <a th:text="${club.title}" th:href="@{/clubs/{clubId}(clubId=${club.id})}" class="btn btn-dark">Project name</a>
                         <a class="btn btn-primary" th:href="@{/clubs/{clubId}/edit(clubId=${club.id})}">Edit</a>
+                        <a class="btn btn-danger" th:href="@{/clubs/{clubId}/delete(clubId=${club.id})}">Delete</a>
                     </div>
                 </div>
             </div>
@@ -78,7 +82,7 @@
                                 },
                             ],
                             guiStyle: "bootstrap",
-                            iconSet: "bootstrap",
+                            iconSet: "fontAwesome",
                             idPrefix: "club_",
                             rownumbers: true,
                             sortname: "createdOn",

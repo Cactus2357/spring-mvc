@@ -12,18 +12,15 @@
     <section layout:fragment="body" class="py-5">
         <div class="container">
             <h5>Test</h5>
-            <div class="list-group">
-                <button type="button" class="list-group-item list-group-item-action">
-                    <a th:href="@{/clubs}" class="nav-link">Clubs List</a>
-                </button>
-            </div>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-action"><a th:href="@{/clubs}" class="nav-link">Clubs list</a></li>
+            </ul>
             <hr>
             <h5>Book Management</h5>
-            <div class="list-group">
-                <button type="button" class="list-group-item list-group-item-action">
-                    <a th:href="@{/clubs}" class="nav-link">#</a>
-                </button>
-            </div>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-action"><a th:href="@{/members}" class="nav-link">Members</a></li>
+                <li class="list-group-item list-group-item-action"><a th:href="@{/books}" class="nav-link">Book list</a></li>
+            </ul>
         </div>
     </section>
 </main>

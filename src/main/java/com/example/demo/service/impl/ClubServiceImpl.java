@@ -7,7 +7,9 @@ import com.example.demo.service.ClubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +29,21 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
+    public Optional<List<ClubDto>> getClubsByTitle(String query) {
+        List<String> queryArray = Arrays.asList(query.split("\\s+"));
+
+        List<Club> filteredClubs = clubMapper.findAll()
+                .stream()
+                .filter(club -> queryArray.stream()
+                        .anyMatch(queryPart -> club.getTitle().toLowerCase().contains(queryPart.toLowerCase())))
+                .toList();
+
+        return Optional.of(filteredClubs.stream()
+                .map(this::mapToClubDto)
+                .toList());
+    }
+
+    @Override
     public void save(ClubDto clubDto) {
         clubMapper.save(mapToClub(clubDto));
     }
@@ -40,6 +57,11 @@ public class ClubServiceImpl implements ClubService {
     @Override
     public void updateClub(ClubDto clubDto) {
         clubMapper.update(mapToClub(clubDto));
+    }
+
+    @Override
+    public void deleteClubById(int clubId) {
+        clubMapper.delete(clubId);
     }
 
     private ClubDto mapToClubDto(Club club) {
