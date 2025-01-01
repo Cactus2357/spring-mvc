@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Clubs Form</title>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <section layout:fragment="body" class="py-5">
+
+        <div class="container px-5">
+            <form role="form" method="post" th:action="@{/clubs/new}" th:object="${club}">
+<!--                <div class="mb-3">-->
+<!--                    <label for="email" class="form-label">Email address</label>-->
+<!--                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp">-->
+<!--                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>-->
+<!--                <div class="mb-3">-->
+<!--                    <label for="password" class="form-label">Password</label>-->
+<!--                    <input type="password" class="form-control" id="password">-->
+<!--                </div>-->
+<!--                <div class="mb-3 form-check">-->
+<!--                    <input type="checkbox" class="form-check-input" id="checkbox-1">-->
+<!--                    <label class="form-check-label" for="checkbox-1">Check me out</label>-->
+<!--                </div>-->
+                <div class="mb-3">
+                    <label for="club-title" class="form-label">Club title</label>
+                    <input type="text" class="form-control" id="club-title" name="title" th:field="*{title}" placeholder="Title">
+                </div>
+                <div class="mb-3">
+                    <label for="club-photo-url" class="form-label">Club photo url</label>
+                    <input type="url" class="form-control" id="club-photo-url" name="photoUrl" th:field="*{photoUrl}" placeholder="Photo url">
+                </div>
+                <div class="mb-3">
+                    <label for="club-content" class="form-label">Club content</label>
+                    <input type="text" class="form-control" id="club-content" name="content" th:field="*{content}" placeholder="Write club content here...">
+                </div>
+                <button type="submit" class="btn btn-primary col-12">Submit</button>
+            </form>
+        </div>
+
+    </section>
+</main>
+</body>
+</html>

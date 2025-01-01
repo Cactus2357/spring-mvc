@@ -2,6 +2,7 @@ package com.example.demo.resource;
 
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ public class UserResource {
 
     private final UserMapper userMapper;
 
+    @Autowired
     public UserResource(UserMapper userMapper) {
         this.userMapper = userMapper;
     }
