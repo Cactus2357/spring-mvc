@@ -5,20 +5,24 @@
       layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Clubs List</title>
+    <title>Book List</title>
 </head>
 <body class="d-flex flex-column h-100">
+
+<!-- Header-->
 <main class="flex-shrink-0">
-    <section layout:fragment="body" class="container py-5">
-        <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Club list</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="container px-5">
+    <section layout:fragment="body" class="py-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Library</li>
+            </ol>
+        </nav>
+        <div class="container px-5 my-5">
+            <div class="text-center mb-5">
+                <h1 class="fw-bolder">Our Work</h1>
+                <p class="lead fw-normal text-muted mb-0">Company portfolio</p>
+            </div>
             <div class="container">
                 <a th:href="@{/clubs/new}" class="btn btn-primary">Add club</a>
             </div>
@@ -28,18 +32,12 @@
                     <div th:each="club:${clubs}" class="col-lg-6">
                         <img th:src="${club.photoUrl}" alt="" class="img rounded-3 mb-3">
                         <a th:text="${club.title}" th:href="${club.photoUrl}"
-                           class="btn btn-dark">Project name</a>
-                        <a class="btn btn-primary" th:href="@{/clubs/{clubId}/edit(clubId=${club.id})}">Edit</a>
+                           class="link-dark">Project name</a>
                     </div>
                 </div>
             </div>
             <hr>
-            <div class="container">
-                <details>
-                    <summary>Club list JSON</summary>
-                    <code th:text="${clubs}"></code>
-                </details>
-            </div>
+            <code th:text="${clubs}"></code>
             <hr>
             <div class="container">
                 <table id="club-table" class="table"></table>

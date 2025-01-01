@@ -27,9 +27,20 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public Club saveClub(Club club) {
+    public Club save(Club club) {
         int newClubId = clubMapper.save(club);
         return clubMapper.findById(newClubId);
+    }
+
+    @Override
+    public ClubDto findClubById(int clubId) {
+        Club club = clubMapper.findById(clubId);
+        return mapToClubDto(club);
+    }
+
+    @Override
+    public void updateClub(Club club) {
+        clubMapper.update(club);
     }
 
 

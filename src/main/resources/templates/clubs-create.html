@@ -9,22 +9,13 @@
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
-    <section layout:fragment="body" class="py-5">
+    <section layout:fragment="body" class="container py-5">
 
-        <div class="container px-5">
-            <form role="form" method="post" th:action="@{/clubs/new}" th:object="${club}">
-<!--                <div class="mb-3">-->
-<!--                    <label for="email" class="form-label">Email address</label>-->
-<!--                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp">-->
-<!--                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>-->
-<!--                <div class="mb-3">-->
-<!--                    <label for="password" class="form-label">Password</label>-->
-<!--                    <input type="password" class="form-control" id="password">-->
-<!--                </div>-->
-<!--                <div class="mb-3 form-check">-->
-<!--                    <input type="checkbox" class="form-check-input" id="checkbox-1">-->
-<!--                    <label class="form-check-label" for="checkbox-1">Check me out</label>-->
-<!--                </div>-->
+        <div class="container px-5 col-10">
+            <form role="form" method="post" th:action="@{/clubs}" th:object="${club}">
+                <div>ee
+                    <input type="hidden" id="club-id" name="club-id" th:field="*{id}" hidden="hidden">
+                </div>
                 <div class="mb-3">
                     <label for="club-title" class="form-label">Club title</label>
                     <input type="text" class="form-control" id="club-title" name="title" th:field="*{title}" placeholder="Title">
