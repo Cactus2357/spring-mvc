@@ -27,9 +27,8 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public Club save(Club club) {
-        int newClubId = clubMapper.save(club);
-        return clubMapper.findById(newClubId);
+    public void save(ClubDto clubDto) {
+        clubMapper.save(mapToClub(clubDto));
     }
 
     @Override
@@ -39,13 +38,23 @@ public class ClubServiceImpl implements ClubService {
     }
 
     @Override
-    public void updateClub(Club club) {
-        clubMapper.update(club);
+    public void updateClub(ClubDto clubDto) {
+        clubMapper.update(mapToClub(clubDto));
     }
-
 
     private ClubDto mapToClubDto(Club club) {
         return ClubDto.builder()
+                .id(club.getId())
+                .title(club.getTitle())
+                .photoUrl(club.getPhotoUrl())
+                .content(club.getContent())
+                .createdOn(club.getCreatedOn())
+                .updatedOn(club.getUpdatedOn())
+                .build();
+    }
+
+    private Club mapToClub(ClubDto club) {
+        return Club.builder()
                 .id(club.getId())
                 .title(club.getTitle())
                 .photoUrl(club.getPhotoUrl())

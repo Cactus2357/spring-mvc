@@ -26,9 +26,8 @@
             <div class="container">
                 <div class="row g-3">
                     <div th:each="club:${clubs}" class="col-lg-6">
-                        <img th:src="${club.photoUrl}" alt="" class="img rounded-3 mb-3">
-                        <a th:text="${club.title}" th:href="${club.photoUrl}"
-                           class="btn btn-dark">Project name</a>
+                        <img th:src="${club.photoUrl}" alt="" class="img-fluid rounded-3 mb-3">
+                        <a th:text="${club.title}" th:href="${club.photoUrl}" class="btn btn-dark">Project name</a>
                         <a class="btn btn-primary" th:href="@{/clubs/{clubId}/edit(clubId=${club.id})}">Edit</a>
                     </div>
                 </div>
@@ -57,7 +56,7 @@
                                 {
                                     name: "photoUrl",
                                     label: "Photo",
-                                    width: 200,
+                                    width: 300,
                                     formatter: (cellValue) => `<a target="_blank" href="${cellValue}">${cellValue}</a>`
                                 },
                                 {name: "content", label: "Content", width: 300},

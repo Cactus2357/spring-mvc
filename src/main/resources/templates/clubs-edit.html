@@ -15,7 +15,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
                     <li class="breadcrumb-item"><a th:href="@{/clubs}">Club list</a></li>
-                    <li class="breadcrumb-item">Edit</li>
+                    <li class="breadcrumb-item">Edit club</li>
                 </ol>
             </nav>
         </div>
@@ -26,18 +26,20 @@
                 </div>
                 <div class="mb-3">
                     <label for="club-title" class="form-label">Club title</label>
-                    <input type="text" class="form-control" id="club-title" name="title" th:field="*{title}"
-                           placeholder="Title">
+                    <input type="text" class="form-control" id="club-title" name="title" th:field="*{title}" placeholder="Title">
+                    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="form-text text-danger"></div>
                 </div>
                 <div class="mb-3">
                     <label for="club-photo-url" class="form-label">Club photo url</label>
                     <input type="url" class="form-control" id="club-photo-url" name="photoUrl" th:field="*{photoUrl}"
                            placeholder="Photo url">
+                    <div th:if="${#fields.hasErrors('photoUrl')}" th:errors="*{photoUrl}" class="form-text text-danger"></div>
                 </div>
                 <div class="mb-3">
                     <label for="club-content" class="form-label">Club content</label>
                     <input type="text" class="form-control" id="club-content" name="content" th:field="*{content}"
                            placeholder="Write club content here...">
+                    <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="form-text text-danger"></div>
                 </div>
                 <button type="submit" class="btn btn-primary col-12">Submit</button>
             </form>
