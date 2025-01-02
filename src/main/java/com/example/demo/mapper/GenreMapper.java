@@ -1,5 +1,6 @@
 package com.example.demo.mapper;
 
+import com.example.demo.model.BookGenre;
 import com.example.demo.model.Genre;
 import org.apache.ibatis.annotations.*;
 
@@ -14,7 +15,7 @@ public interface GenreMapper {
     Genre findById(Integer genreId);
 
     @Insert("insert into bookdb.genres (genre_name) values (#{genreName})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "genreId")
     int insert(Genre genre);
 
     @Update("update bookdb.genres set genre_name = #{genreName} where genre_id = #{genreId}")
@@ -23,5 +24,6 @@ public interface GenreMapper {
     @Delete("delete from bookdb.genres where genre_id = #{genreId}")
     void delete(int genreId);
 
-
+    @Select("select * from bookdb.book_genres")
+    List<BookGenre> findAllBookGenre();
 }

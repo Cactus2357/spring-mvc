@@ -5,7 +5,7 @@
       layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Book List</title>
+    <title>Genre List</title>
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
@@ -14,71 +14,149 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a class="text-decoration-none" th:href="@{/}">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Book list</li>
+                    <li class="breadcrumb-item active" aria-current="page">Genre list</li>
                 </ol>
             </nav>
         </div>
         <div class="container px-5 my-5">
             <div class="container">
                 <div class="row">
-                    <form class="col-6" role="form" method="post" th:action="@{/books}">
-                        <input type="hidden" id="book-id" name="bookId" hidden="hidden">
+                    <form class="col-lg-6">
+                        <input type="text" class="visually-hidden" id="genre-id" name="genreId">
                         <div class="mb-3">
-                            <label for="book-title" class="form-label">Title*</label>
-                            <input type="text" class="form-control form-control-sm" id="book-title" name="title"
-                                   placeholder="Title">
+                            <label for="genre-name" class="form-label">Title*</label>
+                            <input type="text" class="form-control form-control-sm" id="genre-name" name="genreName"
+                                   placeholder="Name...">
                         </div>
-                        <div class="mb-3">
-                            <label for="book-quantity" class="form-label">Quantity*</label>
-                            <input type="number" class="form-control form-control-sm" id="book-quantity" name="quantity"
-                                   placeholder="Quantity...">
-                        </div>
-                        <div class="mb-3">
-                            <label for="book-author" class="form-label">Author</label>
-                            <input type="text" class="form-control form-control-sm" id="book-author" name="author"
-                                   placeholder="Author (optional)">
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-primary col-6">Submit</button>
+                        <button type="submit" id="submit-genre" class="btn btn-sm btn-primary col-6">Submit</button>
                         <button type="reset" class="btn btn-sm btn-secondary col-3">Clear</button>
                     </form>
                 </div>
             </div>
             <hr>
             <div class="container">
-                <table id="book-table" class="table"></table>
+                <table id="genre-table" class="table"></table>
                 <script th:inline="javascript">
                     //<![CDATA[
                     $(function () {
                         "use strict";
-                        const data = /*[[${bookList}]]*/ '[]';
-                        $("#book-table").jqGrid({
-                            data: data,
+                        const $table = $('#genre-table');
+                        const FORM = {
+                            genreId: $('#genre-id'),
+                            genreName: $('#genre-name')
+                        }
+
+                        function ajaxRequest
+                        ({
+                             url = '/demo/api/v1/genres',
+                             method = 'get',
+                             data = null,
+                             successCallback = null,
+                             errorCallback = (xhr) => {
+                                 alert(`Failed to ${method} data. Status: ${xhr.status} ${xhr.statusText}`);
+                             },
+                             timeout = 5000
+                         }) {
+                            $.ajax({
+                                url: url,
+                                type: method,
+                                contentType: "application/json",
+                                data: data ? JSON.stringify(data) : null,
+                                success: successCallback,
+                                error: errorCallback,
+                                timeout: timeout
+                            });
+                        }
+
+                        function clearForm() {
+                            FORM.genreId.val('');
+                            FORM.genreName.val('');
+                        }
+
+                        function onSelectRow(rowId) {
+                            const rowData = $(this).jqGrid('getRowData', rowId);
+                            $("#genre-id").val(rowData.genreId);
+                            $("#genre-name").val(rowData.genreName);
+                        }
+
+                        $table.jqGrid({
+                            url: /*[[@{/api/v1/genres}]]*/ "/demo/api/v1/genres",
+                            datatype: "json",
+                            mtype: "get",
                             colModel: [
-                                {name: "bookId", label: "ID", width: 50, key: true},
-                                {name: "title", label: "Title", width: 200},
-                                {name: "author", label: "Author", width: 150},
-                                {name: "quantity", label: "Quantity", width: 100},
+                                {name: "genreId", label: "ID", width: 50, key: true},
+                                {name: "genreName", label: "Name"},
                                 {
-                                    label: "Option", width: 50, formatter: (cellValue, options, rowObject) => `<a href="books/${rowObject.bookId}/delete">Delete</a>`
+                                    label: "", width: 100, formatter: (cellValue, options, rowObject) => {
+                                        return `<button class="btn btn-danger btn-sm delete-genre" data-id="${rowObject.genreId}">Delete</button>`
+                                    }
                                 }
                             ],
-                            guiStyle: "bootstrap",
+                            guiStyle: "bootstrap4",
                             iconSet: "fontAwesome",
-                            caption: "Book table",
+                            caption: "Genre list",
                             pager: "#pager",
-                            onSelectRow: function (rowId) {
-                                const rowData = $(this).jqGrid('getRowData', rowId);
-                                $("#book-id").val(rowData.bookId);
-                                $("#book-title").val(rowData.title);
-                                $("#book-author").val(rowData.author);
-                                $("#book-quantity").val(rowData.quantity);
+                            rowNum: 10,
+                            rowList: [10, 20, 50],
+                            viewrecords: true,
+                            height: "auto",
+                            jsonReader: {
+                                id: "genreId"
+                            },
+                            width: 600,
+                            onSelectRow: onSelectRow,
+                        });
+
+                        function addGenre() {
+                            ajaxRequest({
+                                method: 'post',
+                                data: {genreName: FORM.genreName.val()},
+                                successCallback: () => {
+                                    $('#genre-table').trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Genre added successfully.");
+                                }
+                            });
+                        }
+
+                        function updateGenre(genreId) {
+                            ajaxRequest({
+                                url: `/demo/api/v1/genres/${genreId}`,
+                                method: 'put',
+                                data: {genreId, genreName: FORM.genreName.val()},
+                                successCallback: () => {
+                                    $('#genre-table').trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Genre updated successfully.");
+                                }
+                            });
+                        }
+
+                        $table.on('click', '.delete-genre', function () {
+                            const genreId = $(this).data('id');
+                            if (!confirm("Are you sure you want to delete this genre?")) return;
+                            ajaxRequest({
+                                url: `/demo/api/v1/genres/${genreId}`,
+                                method: 'delete',
+                                successCallback: () => {
+                                    $('#genre-table').trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Genre deleted successfully.");
+                                }
+                            });
+                        });
+
+                        $('#submit-genre').on('click', (e) => {
+                            e.preventDefault();
+                            const genreId = FORM.genreId.val();
+                            if (genreId) {
+                                updateGenre(genreId);
+                            } else {
+                                addGenre();
                             }
                         });
                     });
                     //]]>
-
-                    $.ajax('')
-
                 </script>
             </div>
         </div>

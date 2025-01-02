@@ -12,14 +12,19 @@
     <section layout:fragment="body" class="py-5">
         <div class="container">
             <h5>Test</h5>
-            <ul class="list-group">
+            <ul class="list-group col-lg-6">
                 <li class="list-group-item list-group-item-action"><a th:href="@{/clubs}" class="nav-link">Clubs list</a></li>
             </ul>
             <hr>
             <h5>Book Management</h5>
-            <ul class="list-group">
+            <ul class="list-group col-lg-6">
                 <li class="list-group-item list-group-item-action"><a th:href="@{/members}" class="nav-link">Members</a></li>
                 <li class="list-group-item list-group-item-action"><a th:href="@{/books}" class="nav-link">Book list</a></li>
+                <li class="list-group-item list-group-item-action"><a th:href="@{/genres}" class="nav-link">Genre list</a></li>
+            </ul>
+            <hr class="col-lg-6">
+            <ul class="list-group col-lg-6">
+                <li class="list-group-item list-group-item-action"><a th:href="@{/borrows}" class="nav-link">Book borrowing management</a></li>
             </ul>
         </div>
     </section>

@@ -21,8 +21,8 @@
         <div class="container px-5 my-5">
             <div class="container">
                 <div class="row">
-                    <form class="col-6" role="form" method="post" th:action="@{/books}">
-                        <input type="hidden" id="book-id" name="bookId" hidden="hidden">
+                    <form class="col-lg-6">
+                        <input type="text" class="visually-hidden" id="book-id" name="bookId" hidden="hidden">
                         <div class="mb-3">
                             <label for="book-title" class="form-label">Title*</label>
                             <input type="text" class="form-control form-control-sm" id="book-title" name="title"
@@ -38,7 +38,7 @@
                             <input type="text" class="form-control form-control-sm" id="book-author" name="author"
                                    placeholder="Author (optional)">
                         </div>
-                        <button type="submit" class="btn btn-sm btn-primary col-6">Submit</button>
+                        <button type="submit" id="submit-book" class="btn btn-sm btn-primary col-6">Submit</button>
                         <button type="reset" class="btn btn-sm btn-secondary col-3">Clear</button>
                     </form>
                 </div>
@@ -50,35 +50,155 @@
                     //<![CDATA[
                     $(function () {
                         "use strict";
-                        const data = /*[[${bookList}]]*/ '[]';
-                        $("#book-table").jqGrid({
-                            data: data,
+
+                        const bookGenreList = /*[[${bookGenreList}]]*/ [];
+                        const genreList = /*[[${genreList}]]*/ [];
+                        let genreLookup = {};
+                        genreList.forEach(genre => {
+                            genreLookup[genre.genreId] = genre.genreName;
+                        })
+
+                        function toGenreString(bookId) {
+                            return bookGenreList.filter(e => e.bookId === bookId).map(e => genreLookup[e.genreId]).join(", ")
+                        }
+
+                        const $table = $('#book-table');
+                        const FORM = {
+                            bookId: $('#book-id'),
+                            title: $('#book-title'),
+                            quantity: $('#book-quantity'),
+                            author: $('#book-author'),
+                        }
+
+                        function ajaxRequest
+                        ({
+                             url = '/demo/api/v1/books',
+                             method = 'get',
+                             data = null,
+                             successCallback = null,
+                             errorCallback = (xhr) => {
+                                 alert(`Failed to ${method} data. Status: ${xhr.status} ${xhr.statusText}`);
+                             },
+                             timeout = 5000
+                         }) {
+                            $.ajax({
+                                url: url,
+                                type: method,
+                                contentType: "application/json",
+                                data: data ? JSON.stringify(data) : null,
+                                success: successCallback,
+                                error: errorCallback,
+                                timeout: timeout
+                            });
+                        }
+
+                        function clearForm() {
+                            FORM.bookId.val('')
+                            FORM.title.val('')
+                            FORM.quantity.val('')
+                            FORM.author.val('')
+                        }
+
+                        function onSelectRow(rowId) {
+                            const rowData = $(this).jqGrid('getRowData', rowId);
+                            FORM.bookId.val(rowData.bookId);
+                            FORM.title.val(rowData.title);
+                            FORM.quantity.val(rowData.quantity);
+                            FORM.author.val(rowData.author);
+                        }
+
+                        $table.jqGrid({
+                            url: /*[[@{/api/v1/books}]]*/ "/demo/api/v1/books",
+                            datatype: "json",
+                            mtype: "get",
                             colModel: [
                                 {name: "bookId", label: "ID", width: 50, key: true},
-                                {name: "title", label: "Title", width: 200},
+                                {name: "title", label: "Title", width: 250},
+                                {
+                                    name: "genre", label: "Genres", width: 250,
+                                    formatter: (cellValue, options, rowObject) => toGenreString(rowObject.bookId)
+                                },
                                 {name: "author", label: "Author", width: 150},
                                 {name: "quantity", label: "Quantity", width: 100},
                                 {
-                                    label: "Option", width: 50, formatter: (cellValue, options, rowObject) => `<a href="books/${rowObject.bookId}/delete">Delete</a>`
+                                    label: "", width: 100, formatter: (cellValue, options, rowObject) => {
+                                        return `<button class="btn btn-danger btn-sm delete-book" data-id="${rowObject.genreId}">Delete</button>`
+                                    }
                                 }
                             ],
-                            guiStyle: "bootstrap",
+                            guiStyle: "bootstrap4",
                             iconSet: "fontAwesome",
-                            caption: "Book table",
+                            caption: "Book list",
                             pager: "#pager",
-                            onSelectRow: function (rowId) {
-                                const rowData = $(this).jqGrid('getRowData', rowId);
-                                $("#book-id").val(rowData.bookId);
-                                $("#book-title").val(rowData.title);
-                                $("#book-author").val(rowData.author);
-                                $("#book-quantity").val(rowData.quantity);
+                            rowNum: 10,
+                            rowList: [10, 20, 50],
+                            viewrecords: true,
+                            height: "auto",
+                            jsonReader: {
+                                id: "bookId"
+                            },
+                            onSelectRow: onSelectRow,
+                        });
+
+                        function create() {
+                            ajaxRequest({
+                                method: 'post',
+                                data: {
+                                    title: FORM.title.val(),
+                                    quantity: FORM.quantity.val(),
+                                    author: FORM.author.val()
+                                },
+                                successCallback: () => {
+                                    $table.trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Book record added successfully.");
+                                }
+                            });
+                        }
+
+                        function update(bookId) {
+                            ajaxRequest({
+                                url: `/demo/api/v1/books/${bookId}`,
+                                method: 'put',
+                                data: {
+                                    bookId,
+                                    title: FORM.title.val(),
+                                    quantity: FORM.quantity.val(),
+                                    author: FORM.author.val()
+                                },
+                                successCallback: () => {
+                                    $table.trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Book record updated successfully.");
+                                }
+                            });
+                        }
+
+                        $table.on('click', '.delete-book', function () {
+                            const bookId = $(this).data('id');
+                            if (!confirm("Are you sure you want to delete this record?")) return;
+                            ajaxRequest({
+                                url: `/demo/api/v1/books/${bookId}`,
+                                method: 'delete',
+                                successCallback: () => {
+                                    $table.trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Book record deleted successfully.");
+                                }
+                            });
+                        });
+
+                        $('#submit-book').on('click', (e) => {
+                            e.preventDefault();
+                            const id = FORM.bookId.val();
+                            if (id) {
+                                update(id);
+                            } else {
+                                create();
                             }
                         });
                     });
                     //]]>
-
-                    $.ajax('')
-
                 </script>
             </div>
         </div>

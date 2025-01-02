@@ -14,7 +14,7 @@ public interface MemberMapper {
     Member findById(int memberId);
 
     @Insert("insert into bookdb.members (name, email, membership_type) values (#{name}, #{email}, #{membershipType})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "memberId")
     int insert(Member member);
 
     @Update("update bookdb.members set name = #{name}, email = #{email}, membership_type = #{membershipType} where member_id = #{memberId}")

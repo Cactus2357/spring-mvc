@@ -5,7 +5,7 @@
       layout:decorate="~{layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Book List</title>
+    <title>Member List</title>
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
@@ -21,8 +21,8 @@
         <div class="container px-5 my-5">
             <div class="container">
                 <div class="row">
-                    <form class="col-6" role="form" method="post" th:action="@{/members}">
-                        <input type="hidden" id="member-id" name="memberId" hidden="hidden">
+                    <form class="col-lg-6">
+                        <input type="text" class="visually-hidden" id="member-id" name="memberId" hidden="hidden">
                         <div class="mb-3">
                             <label for="member-name" class="form-label">Username*</label>
                             <input type="text" class="form-control form-control-sm" id="member-name" name="name"
@@ -35,15 +35,15 @@
                         </div>
                         <div class="mb-3">
                             <label for="member-membership-type" class="form-label">Membership</label>
-                            <select class="form-select form-select-sm" name="membershipType" id="member-membership-type">
+                            <select class="form-select form-select-sm" name="membershipType"
+                                    id="member-membership-type">
                                 <option value="standard">Standard (default)</option>
                                 <option value="premium">Premium</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-sm btn-primary col-6">Submit</button>
+                        <button type="submit" id="submit-member" class="btn btn-sm btn-primary col-6">Submit</button>
                         <button type="reset" class="btn btn-sm btn-secondary col-3">Clear</button>
                     </form>
-
                 </div>
             </div>
             <hr>
@@ -53,32 +53,126 @@
                     //<![CDATA[
                     $(function () {
                         "use strict";
-                        const data = /*[[${memberList}]]*/ '[]';
-                        $("#member-table").jqGrid({
-                            data: data,
+
+                        const $table = $('#member-table');
+                        const FORM = {
+                            memberId: $('#member-id'),
+                            name: $('#member-name'),
+                            email: $('#member-email'),
+                            membershipType: $('#member-membership-type'),
+                        };
+
+                        function ajaxRequest
+                        ({
+                             url = '/demo/api/v1/members',
+                             method = 'get',
+                             data = null,
+                             successCallback = null,
+                             errorCallback = (xhr) => {
+                                 alert(`Failed to ${method} data. Status: ${xhr.status} ${xhr.statusText}`);
+                             },
+                             timeout = 5000
+                         }) {
+                            $.ajax({
+                                url: url,
+                                type: method,
+                                contentType: "application/json",
+                                data: data ? JSON.stringify(data) : null,
+                                success: successCallback,
+                                error: errorCallback,
+                                timeout: timeout
+                            });
+                        }
+
+                        function clearForm() {
+                            FORM.memberId.val('');
+                            FORM.name.val('');
+                            FORM.email.val('');
+                            FORM.membershipType.val('standard');
+                        }
+
+                        $table.jqGrid({
+                            url: /*[[@{/api/v1/members}]]*/ "/demo/api/v1/members",
+                            datatype: "json",
+                            mtype: "get",
                             colModel: [
-                                {name: "memberId", label: "ID", width: 50, key: true},
+                                {name: "memberId", label: "ID", width: 50, key: true, sorttype: 'int'},
                                 {name: "name", label: "Name", width: 150},
                                 {name: "email", label: "Email", width: 200},
-                                {name: "joinDate", label: "Join date", width: 150, sorttype: "date",formatter: "date",formatoptions: {newformat: "d-M-Y"}},
-                                {name: "membershipType", label: "Membership", width: 100},
+                                {
+                                    name: "joinDate",
+                                    label: "Join Date",
+                                    width: 150,
+                                    sorttype: "date",
+                                    formatter: "date",
+                                    formatoptions: {newformat: "d-M-Y"},
+                                },
+                                { name: "membershipType", label: "Membership", width: 100 },
                             ],
-                            guiStyle: "bootstrap",
+                            guiStyle: "bootstrap4",
                             iconSet: "fontAwesome",
-                            caption: "Book table",
+                            caption: "Members table",
                             pager: "#pager",
+                            height: "auto",
+                            jsonReader: {
+                                id: "memberId"
+                            },
                             onSelectRow: function (rowId) {
                                 const rowData = $(this).jqGrid('getRowData', rowId);
-                                $("#member-id").val(rowData.memberId);
-                                $("#member-name").val(rowData.name);
-                                $("#member-email").val(rowData.email);
-                                $("#member-membership-type").val(rowData.membershipType);
+                                FORM.memberId.val(rowData.memberId);
+                                FORM.name.val(rowData.name);
+                                FORM.email.val(rowData.email);
+                                FORM.membershipType.val(rowData.membershipType);
+                            },
+                        });
+
+                        function createRequest() {
+                            ajaxRequest({
+                                method: 'post',
+                                data: {
+                                    name: FORM.name.val(),
+                                    email: FORM.email.val(),
+                                    membershipType: FORM.membershipType.val(),
+                                },
+                                successCallback: () => {
+                                    $table.trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Member added successfully.");
+                                }
+                            });
+                        }
+
+                        function updateRequest(memberId) {
+                            ajaxRequest({
+                                url: `/demo/api/v1/members/${memberId}`,
+                                method: 'put',
+                                data: {
+                                    memberId: memberId,
+                                    name: FORM.name.val(),
+                                    email: FORM.email.val(),
+                                    membershipType: FORM.membershipType.val(),
+                                },
+                                successCallback: () => {
+                                    $table.trigger('reloadGrid');
+                                    clearForm();
+                                    alert("Member info updated successfully.");
+                                }
+                            });
+                        }
+
+                        $('#submit-member').on('click', (e) => {
+                            e.preventDefault();
+                            const id = FORM.memberId.val();
+                            if (id) {
+                                updateRequest(id);
+                            } else {
+                                createRequest();
                             }
                         });
                     });
                     //]]>
-                    $.ajax('')
                 </script>
+
             </div>
         </div>
     </section>
